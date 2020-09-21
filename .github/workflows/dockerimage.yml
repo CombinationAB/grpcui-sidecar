@@ -23,7 +23,7 @@ jobs:
         DOCKER_HUB_KEY: ${{ secrets.DOCKER_HUB_KEY }}
     - name: Build Docker image
       run: | 
-        docker build . --file Dockerfile --build-arg --tag docker.pkg.github.com/combinationab/grpcui-sidecar/grpcui-sidecar:latest
+        docker build . --file Dockerfile --tag docker.pkg.github.com/combinationab/grpcui-sidecar/grpcui-sidecar:latest
         docker tag docker.pkg.github.com/combinationab/grpcui-sidecar/grpcui-sidecar:latest combination/grpcui-sidecar:latest
     - name: Push Docker image
       run: |
