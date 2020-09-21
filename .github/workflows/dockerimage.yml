@@ -1,0 +1,31 @@
+name: Docker image
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-18.04
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Docker login
+      run: |
+        echo ${GITHUB_TOKEN} | docker login -u ${GITHUB_ACTOR} --password-stdin docker.pkg.github.com
+        echo ${DOCKER_HUB_KEY} | docker login -u cmbdevopsbot --password-stdin
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        DOCKER_HUB_KEY: ${{ secrets.DOCKER_HUB_KEY }}
+    - name: Build Docker image
+      run: | 
+        docker build . --file Dockerfile --build-arg --tag docker.pkg.github.com/combinationab/grpcui-sidecar/grpcui-sidecar:latest
+        docker tag docker.pkg.github.com/combinationab/grpcui-sidecar/grpcui-sidecar:latest combination/grpcui-sidecar:latest
+    - name: Push Docker image
+      run: |
+        docker push docker.pkg.github.com/combinationab/grpcui-sidecar/grpcui-sidecar:latest
+        docker push combination/grpcui-sidecar:latest
