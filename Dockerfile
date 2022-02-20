@@ -1,17 +1,14 @@
-FROM golang:1.15.2-alpine3.12 AS build
-
-RUN apk --no-cache add git make gcc musl-dev
-RUN go get honnef.co/go/tools/cmd/staticcheck && go install honnef.co/go/tools/cmd/staticcheck
-#RUN go get github.com/fullstorydev/grpcui/standalone \
-# && go install github.com/fullstorydev/grpcui/standalone/cmd/grpcui
-#RUN go get github.com/fullstorydev/grpcui \
-# && go install github.com/fullstorydev/grpcui/cmd/grpcui
+ARG grpcui_version
+FROM golang:1.17.7-alpine3.15 AS build
+RUN apk add --no-cache git
+#RUN go get honnef.co/go/tools/cmd/staticcheck && go install honnef.co/go/tools/cmd/staticcheck
 WORKDIR /build
-RUN git clone https://github.com/fullstorydev/grpcui
-RUN cd /build/grpcui && PATH=$PATH:/root/go/bin/ make && make install
+ARG grpcui_version
+RUN git clone --branch v${grpcui_version} --depth 1 https://github.com/fullstorydev/grpcui
+RUN cd /build/grpcui && CGO_ENABLED=0 go build ./cmd/grpcui
 
-FROM alpine:3.12 AS runtime
+FROM alpine:3.15 AS runtime
 
-COPY --from=build /go/bin/grpcui /usr/bin/
+COPY --from=build /build/grpcui/grpcui /usr/bin/grpcui
 
 CMD [ "/usr/bin/grpcui" ]
