@@ -12,7 +12,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest-4-cores
+    runs-on: grpcui-sidecar
     steps:
     - name: Set up multiarch
       uses: docker/setup-qemu-action@v1
